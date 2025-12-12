@@ -3,7 +3,8 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./Login.jsx";
 import NewLogin from "./NewLogin.jsx";
-import Home from "./Home.jsx";
+import Home from "./HOME.JSX";
+
 
 
 
@@ -16,7 +17,7 @@ function App() {
         <Route path="/home" element={<Home />} />
         <Route path="*" element={<Login />} /> {/* Default sahifa */}
       </Routes>
-
+      <Home />
     </Router>
   );
 }

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Login.css";
 
@@ -16,39 +16,25 @@ export default function Login() {
     process.env.PUBLIC_URL + `/Music/track${i + 1}.mp3`
   );
 
-// Random musiqa tanlash funksiyasi
-const playRandomTrack = () => {
-  const randomIndex = Math.floor(Math.random() * musicList.length);
-  setTrack(musicList[randomIndex]);
-};
+  // Random musiqa tanlash funksiyasi useCallback bilan
+  const playRandomTrack = useCallback(() => {
+    const randomIndex = Math.floor(Math.random() * musicList.length);
+    setTrack(musicList[randomIndex]);
+  }, [musicList]);
 
-// useEffect faqat sahifa yuklanganda birinchi random track
-useEffect(() => {
-  playRandomTrack();
-}, [playRandomTrack]);
+  // useEffect faqat sahifa yuklanganda birinchi random track
+  useEffect(() => {
+    playRandomTrack();
+  }, [playRandomTrack]);
 
-
-// Audio element
-{track && (
-  <audio
-    ref={audioRef}
-    src={track}
-    loop={false}          // loop o'chirildi
-    preload="auto"
-    onEnded={playRandomTrack} // tugaganda yangi random track
-    autoPlay={playing}    // agar already playing bo'lsa
-  />
-)}
-
-// startMusic funksiyasi
-const startMusic = () => {
-  if (audioRef.current) {
-    audioRef.current.volume = 0.9;
-    audioRef.current.play();
-    setPlaying(true);
-  }
-};
-
+  // startMusic funksiyasi
+  const startMusic = () => {
+    if (audioRef.current) {
+      audioRef.current.volume = 0.9;
+      audioRef.current.play();
+      setPlaying(true);
+    }
+  };
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -70,7 +56,17 @@ const startMusic = () => {
         <div className="vinyl-center">SPACE IT</div>
       </div>
 
-      {track && <audio ref={audioRef} src={track} loop preload="auto" />}
+      {/* Audio */}
+      {track && (
+        <audio
+          ref={audioRef}
+          src={track}
+          loop={false}
+          preload="auto"
+          onEnded={playRandomTrack}
+          autoPlay={playing}
+        />
+      )}
 
       <div className="login-box large">
         <h1 style={{ color: "cyan" }}>Hozirgi loginingizni kiriting</h1>

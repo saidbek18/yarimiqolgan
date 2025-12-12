@@ -25,7 +25,7 @@ export default function NewLogin() {
 
   useEffect(() => {
     playRandomTrack();
-  }, []);
+  }, [playRandomTrack]);
 
   // Start Music funksiyasi
   const startMusic = () => {

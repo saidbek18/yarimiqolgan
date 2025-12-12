@@ -25,7 +25,8 @@ const playRandomTrack = () => {
 // useEffect faqat sahifa yuklanganda birinchi random track
 useEffect(() => {
   playRandomTrack();
-}, []);
+}, [playRandomTrack]);
+
 
 // Audio element
 {track && (

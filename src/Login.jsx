@@ -1,69 +1,116 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import "./Login.css";
 
 export default function Login() {
-  const TRACK_COUNT = 1; // qancha qo‘shiq bo‘lsa, shuncha raqam yoz
+  const TRACK_COUNT = 21;
   const audioRef = useRef(null);
+  const navigate = useNavigate();
 
-  // music list inside public/Music/
-  const musicList = Array.from({ length: TRACK_COUNT }, (_, i) => 
-    process.env.PUBLIC_URL + `/Music/track${i + 1}.mp3`
-  );
-
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [track, setTrack] = useState(null);
   const [playing, setPlaying] = useState(false);
 
-  // Random musiqa tanlash
-  useEffect(() => {
-    const randomIndex = Math.floor(Math.random() * musicList.length);
-    setTrack(musicList[randomIndex]);
-  }, []); // eslint-disable-line
+  const musicList = Array.from({ length: TRACK_COUNT }, (_, i) =>
+    process.env.PUBLIC_URL + `/Music/track${i + 1}.mp3`
+  );
 
-  useEffect(() => {
-    if (playing && audioRef.current) {
-      audioRef.current.play().catch(() => {
-        setPlaying(false);
-      });
-    }
-  }, [playing]);
+// Random musiqa tanlash funksiyasi
+const playRandomTrack = () => {
+  const randomIndex = Math.floor(Math.random() * musicList.length);
+  setTrack(musicList[randomIndex]);
+};
 
-  const startMusic = () => {
-    if (audioRef.current) {
-      audioRef.current.volume = 0.9;
-      audioRef.current.play();
-      setPlaying(true);
+// useEffect faqat sahifa yuklanganda birinchi random track
+useEffect(() => {
+  playRandomTrack();
+}, []);
+
+// Audio element
+{track && (
+  <audio
+    ref={audioRef}
+    src={track}
+    loop={false}          // loop o'chirildi
+    preload="auto"
+    onEnded={playRandomTrack} // tugaganda yangi random track
+    autoPlay={playing}    // agar already playing bo'lsa
+  />
+)}
+
+// startMusic funksiyasi
+const startMusic = () => {
+  if (audioRef.current) {
+    audioRef.current.volume = 0.9;
+    audioRef.current.play();
+    setPlaying(true);
+  }
+};
+
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    const users = JSON.parse(localStorage.getItem("users") || "[]");
+    const found = users.find(
+      (user) => user.login === email && user.password === password
+    );
+    if (found) {
+      navigate("/home");
+    } else {
+      alert("Login yoki parol noto‘g‘ri!");
     }
   };
 
   return (
     <div className="login-page">
-
       {/* Vinyl Background */}
       <div className={`vinyl-bg ${playing ? "spin" : ""}`}>
         <div className="vinyl-center">SPACE IT</div>
       </div>
 
-      {/* Audio */}
       {track && <audio ref={audioRef} src={track} loop preload="auto" />}
 
-      {/* Login Box */}
-      <div className="login-box">
-        <h1 className="title">SPACE <span className="it">IT</span></h1>
+      <div className="login-box large">
+        <h1 style={{ color: "cyan" }}>Hozirgi loginingizni kiriting</h1>
 
-        <div className="input-group">
-          <input required type="email" />
-          <label>Email</label>
-        </div>
+        <form onSubmit={handleLogin}>
+          <div className="input-group">
+            <input
+              type="text"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+            <label style={{ color: "cyan" }}>Email</label>
+          </div>
 
-        <div className="input-group">
-          <input required type="password" />
-          <label>Password</label>
-        </div>
+          <div className="input-group">
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+            <label style={{ color: "cyan" }}>Password</label>
+          </div>
 
-        <button className="btn-login">LOGIN</button>
+          <button type="submit" className="btn-login">
+            LOGIN
+          </button>
+        </form>
+
+        <p style={{ marginTop: "10px", color: "white" }}>
+          Hisobingiz yo‘qmi?{" "}
+          <span
+            onClick={() => navigate("/new-login")}
+            style={{ cursor: "pointer", color: "cyan", fontWeight: "bold" }}
+          >
+            Yangi akaunt ochish
+          </span>
+        </p>
       </div>
 
-      {/* Overlay Start Button */}
       {!playing && (
         <div className="start-overlay" onClick={startMusic}>
           <div className="start-btn">
